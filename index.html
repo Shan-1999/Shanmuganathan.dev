@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -29,6 +29,11 @@
 
   --green: rgba(160,240,180,0.85);
   --green-glow: rgba(120,220,150,0.15);
+
+  --aurora-a: #a78bfa;
+  --aurora-b: #22d3ee;
+  --aurora-gradient: linear-gradient(120deg, var(--aurora-a), var(--aurora-b));
+  --aurora-glow: rgba(140,150,250,0.22);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,12 +53,50 @@ body {
 ═══════════════════════════════════════ */
 .cosmos {
   position: fixed; inset: 0; z-index: 0; overflow: hidden;
-  background: #000000;
+  background:
+    radial-gradient(ellipse 900px 600px at 15% -10%, rgba(167,139,250,0.16), transparent 60%),
+    radial-gradient(ellipse 800px 700px at 105% 15%, rgba(34,211,238,0.12), transparent 55%),
+    radial-gradient(ellipse 1000px 800px at 50% 110%, rgba(120,90,220,0.10), transparent 60%),
+    #030308;
 }
 #starCanvas {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   z-index: 1; pointer-events: none;
+}
+
+/* Signature: a comet crosses the sky every so often */
+.comet {
+  position: absolute;
+  top: 8%;
+  left: -10%;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: 0 0 6px 1px rgba(255,255,255,0.8);
+  opacity: 0;
+  animation: cometFly 9s ease-in linear infinite;
+  animation-delay: 3s;
+}
+.comet::before {
+  content: '';
+  position: absolute;
+  top: 50%; right: 100%;
+  width: 140px; height: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent, var(--aurora-b) 40%, var(--aurora-a) 75%, rgba(255,255,255,0.9));
+  filter: blur(0.4px);
+}
+@keyframes cometFly {
+  0% { transform: translate(0, 0); opacity: 0; }
+  4% { opacity: 1; }
+  16% { transform: translate(48vw, 22vh); opacity: 0; }
+  100% { transform: translate(48vw, 22vh); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .comet { display: none; }
 }
 
 /* ═══════════════════════════════════════
@@ -71,15 +114,16 @@ body {
     0 4px 30px var(--glass-shadow),
     inset 0 1px 0 var(--glass-shine),
     inset 0 -1px 0 rgba(0,0,0,0.3);
-  border-radius: 18px;
+  border-radius: 20px;
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .glass-panel:hover {
   background: var(--glass-hover);
-  border-color: var(--glass-border-hover);
+  border-color: var(--aurora-a);
   box-shadow:
     0 8px 40px rgba(0,0,0,0.75),
+    0 0 30px var(--aurora-glow),
     inset 0 1px 0 rgba(255,255,255,0.13),
     inset 0 -1px 0 rgba(0,0,0,0.35);
   transform: translateY(-3px);
@@ -200,14 +244,14 @@ nav {
 }
 .badge-dot {
   width: 6px; height: 6px;
-  background: var(--green);
+  background: var(--aurora-gradient);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--green-glow), 0 0 16px var(--green-glow);
+  box-shadow: 0 0 8px var(--aurora-glow), 0 0 16px var(--aurora-glow);
   animation: pulseGlow 2.4s ease-in-out infinite;
 }
 @keyframes pulseGlow {
-  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green-glow); }
-  50% { opacity: 0.65; box-shadow: 0 0 14px var(--green-glow); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--aurora-glow); }
+  50% { opacity: 0.65; box-shadow: 0 0 16px var(--aurora-glow); }
 }
 
 .hero-name {
@@ -220,6 +264,13 @@ nav {
   text-shadow:
     0 0 60px rgba(255,255,255,0.08),
     0 2px 8px rgba(0,0,0,0.5);
+}
+
+.hero-name .accent-word {
+  background: var(--aurora-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .hero-sub {
@@ -276,15 +327,16 @@ nav {
 .btn-primary::before {
   content: '';
   position: absolute;
-  top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
-  transition: left 0.45s ease;
+  inset: 0;
+  background: var(--aurora-gradient);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: -1;
 }
-.btn-primary:hover::before { left: 100%; }
+.btn-primary:hover::before { opacity: 0.85; }
 .btn-primary:hover {
-  background: rgba(255,255,255,0.16);
-  border-color: rgba(255,255,255,0.38);
-  box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 24px var(--aurora-glow), inset 0 1px 0 rgba(255,255,255,0.25);
   transform: translateY(-2px);
 }
 
@@ -347,9 +399,11 @@ nav {
   font-weight: 800;
   font-size: 2rem;
   line-height: 1;
-  color: rgba(245,248,255,0.95);
+  background: var(--aurora-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   letter-spacing: -0.03em;
-  text-shadow: 0 0 20px rgba(255,255,255,0.1);
 }
 .stat-label {
   font-family: 'JetBrains Mono', monospace;
@@ -391,8 +445,9 @@ nav {
 }
 .section-eyebrow::before {
   content: '';
-  width: 20px; height: 1px;
-  background: rgba(255,255,255,0.25);
+  width: 20px; height: 2px;
+  background: var(--aurora-gradient);
+  border-radius: 2px;
 }
 
 .section-title {
@@ -555,6 +610,17 @@ nav {
   grid-template-columns: 1fr 1fr;
   gap: 2.5rem;
   align-items: start;
+  border-image: var(--aurora-gradient) 1;
+  box-shadow:
+    0 4px 30px var(--glass-shadow),
+    0 0 40px var(--aurora-glow),
+    inset 0 1px 0 var(--glass-shine);
+}
+.project-card.featured .proj-num {
+  background: var(--aurora-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .proj-num {
@@ -945,6 +1011,7 @@ footer {
 <!-- ═══════════════ COSMOS ═══════════════ -->
 <div class="cosmos">
   <canvas id="starCanvas"></canvas>
+  <div class="comet"></div>
 </div>
 
 <div class="page">
@@ -968,15 +1035,6 @@ footer {
     <a href="https://github.com/Shan-1999" target="_blank" class="social-icon" title="GitHub">
       <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
     </a>
-    <a href="https://www.hackerrank.com/shanmuganathans3" target="_blank" class="social-icon" title="HackerRank">
-      <svg viewBox="0 0 24 24"><path d="M12 0c1.285 0 9.75 4.886 10.392 6 .645 1.115.645 10.885 0 12S13.287 24 12 24C10.712 24 2.25 19.114 1.608 18 .963 16.886.963 7.114 1.608 6 2.254 4.886 10.715 0 12 0zm2.205 6.011h-1.929v4.66H9.255v-4.66H7.25v11.978h2.005v-5.44h3.021v5.44h1.929V6.011z"/></svg>
-    </a>
-    <a href="https://www.hackerearth.com/@shanmuganathans1999" target="_blank" class="social-icon" title="HackerEarth">
-      <svg viewBox="0 0 24 24"><path d="M22.753 11.252H13.23V1.729C13.23.775 12.458 0 11.506 0H1.724C.772 0 0 .775 0 1.729v20.542C0 23.225.772 24 1.724 24h9.782c.952 0 1.724-.775 1.724-1.729V13.748h9.523c.688 0 1.247-.56 1.247-1.248s-.559-1.248-1.247-1.248z"/></svg>
-    </a>
-    <a href="https://leetcode.com/shanmuganathans1999" target="_blank" class="social-icon" title="LeetCode">
-      <svg viewBox="0 0 24 24"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg>
-    </a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -994,9 +1052,6 @@ footer {
   <div class="mobile-social-strip">
     <a href="https://linkedin.com/in/shan2605" target="_blank" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
     <a href="https://github.com/Shan-1999" target="_blank" title="GitHub"><svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
-    <a href="https://www.hackerrank.com/shanmuganathans3" target="_blank" title="HackerRank"><svg viewBox="0 0 24 24"><path d="M12 0c1.285 0 9.75 4.886 10.392 6 .645 1.115.645 10.885 0 12S13.287 24 12 24C10.712 24 2.25 19.114 1.608 18 .963 16.886.963 7.114 1.608 6 2.254 4.886 10.715 0 12 0zm2.205 6.011h-1.929v4.66H9.255v-4.66H7.25v11.978h2.005v-5.44h3.021v5.44h1.929V6.011z"/></svg></a>
-    <a href="https://www.hackerearth.com/@shanmuganathans1999" target="_blank" title="HackerEarth"><svg viewBox="0 0 24 24"><path d="M22.753 11.252H13.23V1.729C13.23.775 12.458 0 11.506 0H1.724C.772 0 0 .775 0 1.729v20.542C0 23.225.772 24 1.724 24h9.782c.952 0 1.724-.775 1.724-1.729V13.748h9.523c.688 0 1.247-.56 1.247-1.248s-.559-1.248-1.247-1.248z"/></svg></a>
-    <a href="https://leetcode.com/shanmuganathans1999" target="_blank" title="LeetCode"><svg viewBox="0 0 24 24"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg></a>
   </div>
 </div>
 
@@ -1008,7 +1063,7 @@ footer {
         <span class="badge-dot"></span>
         Open to opportunities
       </div>
-      <h1 class="hero-name">Shanmuganathan S</h1>
+      <h1 class="hero-name">Shanmuganathan <span class="accent-word">S</span></h1>
       <p class="hero-sub">Software Engineer · Chennai, India</p>
       <div class="hero-divider"></div>
       <p class="hero-desc">
@@ -1102,6 +1157,10 @@ footer {
       <div class="skill-tags"><span class="tag">Spring Boot</span><span class="tag">REST APIs</span><span class="tag">Microservices</span></div>
     </div>
     <div class="skill-card glass-panel">
+      <div class="skill-cat">Agentic AI</div>
+      <div class="skill-tags"><span class="tag">Spring AI</span><span class="tag">MCP</span><span class="tag">pgvector</span><span class="tag">Groq / LLM Tool-Calling</span></div>
+    </div>
+    <div class="skill-card glass-panel">
       <div class="skill-cat">Cloud — AWS</div>
       <div class="skill-tags"><span class="tag">EC2</span><span class="tag">S3</span><span class="tag">IAM</span><span class="tag">RDS</span><span class="tag">CloudWatch</span></div>
     </div>
@@ -1131,23 +1190,35 @@ footer {
     <div class="project-card glass-panel featured">
       <div>
         <div class="proj-num">001 / FEATURED</div>
-        <div class="proj-title">Insurance Add-on Services</div>
-        <div class="proj-desc">End-to-end Spring Boot microservices platform with vendor API integrations, encryption, scheduling, and notification automation for insurance workflows at Sundaram Finance.</div>
+        <div class="proj-title">Rocky AI</div>
+        <div class="proj-desc">Autonomous Java agent with persistent memory and tool-calling, built on Spring AI and Groq (Llama 3.3 70B) with pgvector via NeonDB — capable of reasoning through multi-step tasks and invoking external tools via MCP.</div>
       </div>
       <div>
         <div class="proj-stack">
-          <span class="stack-tag">Spring Boot</span><span class="stack-tag">WSO2 Gateway</span><span class="stack-tag">Kafka</span><span class="stack-tag">PostgreSQL</span><span class="stack-tag">Oracle SQL</span><span class="stack-tag">Chronicle Scheduler</span><span class="stack-tag">Jenkins</span>
+          <span class="stack-tag">Spring AI</span><span class="stack-tag">Groq</span><span class="stack-tag">pgvector</span><span class="stack-tag">PostgreSQL</span><span class="stack-tag">Java 21</span><span class="stack-tag">MCP</span>
         </div>
       </div>
     </div>
     <div class="project-card glass-panel">
       <div class="proj-num">002</div>
+      <div class="proj-title">Rocky MCP Server</div>
+      <div class="proj-desc">Standalone MCP server built from Rocky AI's tool layer, exposing search and finance tools over SSE transport to any MCP-compatible client — a reusable, enterprise-style agentic architecture.</div>
+      <div class="proj-stack"><span class="stack-tag">MCP</span><span class="stack-tag">SSE</span><span class="stack-tag">Java</span><span class="stack-tag">Spring Boot</span></div>
+    </div>
+    <div class="project-card glass-panel">
+      <div class="proj-num">003</div>
+      <div class="proj-title">Insurance Add-on Services</div>
+      <div class="proj-desc">End-to-end Spring Boot microservices platform with vendor API integrations, encryption, scheduling, and notification automation for insurance workflows at Sundaram Finance.</div>
+      <div class="proj-stack"><span class="stack-tag">Spring Boot</span><span class="stack-tag">WSO2 Gateway</span><span class="stack-tag">Kafka</span><span class="stack-tag">PostgreSQL</span><span class="stack-tag">Oracle SQL</span><span class="stack-tag">Chronicle Scheduler</span><span class="stack-tag">Jenkins</span></div>
+    </div>
+    <div class="project-card glass-panel">
+      <div class="proj-num">004</div>
       <div class="proj-title">Enterprise KYC</div>
       <div class="proj-desc">Secure and scalable KYC verification APIs with CERSAI CKYC and RBI ULI integrations, ensuring financial compliance and encryption standards.</div>
       <div class="proj-stack"><span class="stack-tag">Spring Boot</span><span class="stack-tag">REST APIs</span><span class="stack-tag">Oracle SQL</span><span class="stack-tag">CKYC</span><span class="stack-tag">RBI ULI</span></div>
     </div>
     <div class="project-card glass-panel">
-      <div class="proj-num">003</div>
+      <div class="proj-num">005</div>
       <div class="proj-title">Notification Framework</div>
       <div class="proj-desc">Centralized async notification engine powering multi-channel delivery with Kafka-driven routing and scheduling automation.</div>
       <div class="proj-stack"><span class="stack-tag">Kafka</span><span class="stack-tag">Spring Boot</span><span class="stack-tag">AWS</span><span class="stack-tag">Scheduler</span></div>
@@ -1203,18 +1274,6 @@ footer {
     <a href="https://github.com/Shan-1999" target="_blank" class="contact-social-btn">
       <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
       GitHub
-    </a>
-    <a href="https://www.hackerrank.com/shanmuganathans3" target="_blank" class="contact-social-btn">
-      <svg viewBox="0 0 24 24"><path d="M12 0c1.285 0 9.75 4.886 10.392 6 .645 1.115.645 10.885 0 12S13.287 24 12 24C10.712 24 2.25 19.114 1.608 18 .963 16.886.963 7.114 1.608 6 2.254 4.886 10.715 0 12 0zm2.205 6.011h-1.929v4.66H9.255v-4.66H7.25v11.978h2.005v-5.44h3.021v5.44h1.929V6.011z"/></svg>
-      HackerRank
-    </a>
-    <a href="https://www.hackerearth.com/@shanmuganathans1999" target="_blank" class="contact-social-btn">
-      <svg viewBox="0 0 24 24"><path d="M22.753 11.252H13.23V1.729C13.23.775 12.458 0 11.506 0H1.724C.772 0 0 .775 0 1.729v20.542C0 23.225.772 24 1.724 24h9.782c.952 0 1.724-.775 1.724-1.729V13.748h9.523c.688 0 1.247-.56 1.247-1.248s-.559-1.248-1.247-1.248z"/></svg>
-      HackerEarth
-    </a>
-    <a href="https://leetcode.com/shanmuganathans1999" target="_blank" class="contact-social-btn">
-      <svg viewBox="0 0 24 24"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg>
-      LeetCode
     </a>
     <a href="tel:+919360563205" class="contact-social-btn">
       <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
@@ -1603,3 +1662,5 @@ try{
 </script>
 </body>
 </html>
+
+          
